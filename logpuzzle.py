@@ -18,6 +18,7 @@ import os
 import re
 import sys
 import urllib.request
+import urllib.parse
 import argparse
 
 
@@ -26,8 +27,19 @@ def read_urls(filename):
     extracting the hostname from the filename itself, sorting
     alphabetically in increasing order, and screening out duplicates.
     """
-    # +++your code here+++
-    pass
+    lists = []
+    # animal_code.google.com
+    hostname = "http://" + filename.replace("animal_", "") + "/"
+    with open(filename, 'r') as f:
+        for line in f:
+            # print(line.split(']'))
+            matches = re.findall(r'GET \S+ HTTP', line)
+            for match in matches:
+                if match[5:-5] not in lists and "puzzle" in match:
+                    lists.append(match[5: -5])
+                    lists.sort(key=lambda x: x[-8:-4])
+    finallist = [hostname + s for s in lists]
+    return finallist
 
 
 def download_images(img_urls, dest_dir):
@@ -38,10 +50,28 @@ def download_images(img_urls, dest_dir):
     to show each local image file.
     Creates the directory if necessary.
     """
-    # +++your code here+++
-    pass
+    f = []
+    for f in os.listdir('.'):
+        f = 'animal_code.google.com'
 
 
+<i > <body > with open('index.html', 'w') as f:
+                f.write("<html><body>")
+                for file in Files:
+                    f.write(f"<img src={file}>"")
+                    f.write( < /body > </html > )
+    urllib.request.urlretrieve(down_link, path_to_save)
+    print(f)
+
+
+# if f.endswith('.jpg'):
+    #         i = Image.open(f)
+    #         'fn, fext = os.path.splittext(f)'
+
+    #     print('Problem reading:' + f)
+    #     down_link = img_urls
+    #     path_to_save = dest_dir
+    # image1 = Image
 def create_parser():
     """Creates an argument parser object."""
     parser = argparse.ArgumentParser()
@@ -71,4 +101,5 @@ def main(args):
 
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    # main(sys.argv[1:])
+    read_urls('animal_code.google.com')
