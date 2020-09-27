@@ -50,18 +50,20 @@ def download_images(img_urls, dest_dir):
     to show each local image file.
     Creates the directory if necessary.
     """
-    f = []
-    for f in os.listdir('.'):
-        f = 'animal_code.google.com'
-
-
-<i > <body > with open('index.html', 'w') as f:
-                f.write("<html><body>")
-                for file in Files:
-                    f.write(f"<img src={file}>"")
-                    f.write( < /body > </html > )
-    urllib.request.urlretrieve(down_link, path_to_save)
-    print(f)
+    image_count = 0
+    try:
+        os.mkdir(dest_dir)
+    except OSError as E:
+        print(E)
+        exit(1)
+    with open('index.html', 'w') as f:
+        f.write("<html><body>")
+        for file in img_urls:
+            img_name = os.path.join(dest_dir, "img"+str(image_count)+".jpg")
+            f.write(f'<img src="{img_name}" />')
+            image_count += 1
+            urllib.request.urlretrieve(file, img_name)
+        f.write('</body> </html>')
 
 
 # if f.endswith('.jpg'):
@@ -101,5 +103,5 @@ def main(args):
 
 
 if __name__ == '__main__':
-    # main(sys.argv[1:])
-    read_urls('animal_code.google.com')
+    main(sys.argv[1:])
+    # read_urls('animal_code.google.com')
