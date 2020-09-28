@@ -31,15 +31,17 @@ def read_urls(filename):
     # animal_code.google.com
     hostname = "http://" + filename.replace("animal_", "") + "/"
     with open(filename, 'r') as f:
-        for line in f:
-            # print(line.split(']'))
-            matches = re.findall(r'GET \S+ HTTP', line)
-            for match in matches:
-                if match[5:-5] not in lists and "puzzle" in match:
-                    lists.append(match[5: -5])
-                    lists.sort(key=lambda x: x[-8:-4])
-    finallist = [hostname + s for s in lists]
-    return finallist
+        hostname = "http://" + filename.replace("place_", "") + "/"
+        with open(filename, 'r') as f:
+            for line in f:
+                # print(line.split(']'))
+                matches = re.findall(r'GET \S+ HTTP', line)
+                for match in matches:
+                    if match[5:-5] not in lists and "puzzle" in match:
+                        lists.append(match[5: -5])
+                        lists.sort(key=lambda x: x[-8:-4])
+        finallist = [hostname + s for s in lists]
+        return finallist
 
 
 def download_images(img_urls, dest_dir):
