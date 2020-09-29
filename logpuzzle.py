@@ -18,7 +18,14 @@ import os
 import re
 import sys
 import urllib.request
+import urllib.parse
 import argparse
+
+
+def place_sort(url):
+    """helper function to sort by last word"""
+    split_url = url.split("-")
+    return split_url[-1]
 
 
 def read_urls(filename):
@@ -26,8 +33,26 @@ def read_urls(filename):
     extracting the hostname from the filename itself, sorting
     alphabetically in increasing order, and screening out duplicates.
     """
-    # +++your code here+++
-    pass
+    url_list = []
+    server_name = ""
+    sorted_url_list = []
+
+    with open(filename) as f:
+        split_filename = filename.split("_")
+        server_name = split_filename[-1]
+        text = f.read().split(" ")
+        for split_str in text:
+            if filename == "place_code.google.com":
+                if re.search(r"\w+-\w+\.jpg", split_str):
+                    url_list.append("http://" + server_name + split_str)
+                    url_list = list(set(url_list))
+                    sorted_url_list = sorted(url_list, key=place_sort)
+            if filename == "animal_code.google.com":
+                if "puzzle" in split_str and split_str not in url_list:
+                    url_list.append("http://" + server_name + split_str)
+                    url_list = list(set(url_list))
+                    sorted_url_list = sorted(url_list)
+        return sorted_url_list
 
 
 def download_images(img_urls, dest_dir):
@@ -38,8 +63,25 @@ def download_images(img_urls, dest_dir):
     to show each local image file.
     Creates the directory if necessary.
     """
-    # +++your code here+++
-    pass
+    image_count = 0
+    try:
+        os.mkdir(dest_dir)
+    except OSError as E:
+        print(E)
+        exit(1)
+    html_img_tags_string = ""
+    with open(dest_dir + '/index.html', 'w') as f:
+        f.write("<html><body>")
+        for file in img_urls:
+            print("retrieving..: ", file)
+            img_name = os.path.join(dest_dir, "img"+str(image_count)+".jpg")
+            urllib.request.urlretrieve(file, img_name)
+            html_img_tags_string = '<img src="img' + \
+                str(image_count) + '.jpg">'
+            f.write(html_img_tags_string)
+            image_count += 1
+
+        f.write('</body> </html>')
 
 
 def create_parser():
@@ -72,3 +114,4 @@ def main(args):
 
 if __name__ == '__main__':
     main(sys.argv[1:])
+    # read_urls('animal_code.google.com')
