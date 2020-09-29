@@ -22,26 +22,37 @@ import urllib.parse
 import argparse
 
 
+def place_sort(url):
+    """helper function to sort by last word"""
+    split_url = url.split("-")
+    return split_url[-1]
+
+
 def read_urls(filename):
     """Returns a list of the puzzle URLs from the given log file,
     extracting the hostname from the filename itself, sorting
     alphabetically in increasing order, and screening out duplicates.
     """
-    lists = []
-    # animal_code.google.com
-    hostname = "http://" + filename.replace("animal_", "") + "/"
-    with open(filename, 'r') as f:
-        hostname = "http://" + filename.replace("place_", "") + "/"
-        with open(filename, 'r') as f:
-            for line in f:
-                # print(line.split(']'))
-                matches = re.findall(r'GET \S+ HTTP', line)
-                for match in matches:
-                    if match[5:-5] not in lists and "puzzle" in match:
-                        lists.append(match[5: -5])
-                        lists.sort(key=lambda x: x[-8:-4])
-        finallist = [hostname + s for s in lists]
-        return finallist
+    url_list = []
+    server_name = ""
+    sorted_url_list = []
+
+    with open(filename) as f:
+        split_filename = filename.split("_")
+        server_name = split_filename[-1]
+        text = f.read().split(" ")
+        for split_str in text:
+            if filename == "place_code.google.com":
+                if re.search(r"\w+-\w+\.jpg", split_str):
+                    url_list.append("http://" + server_name + split_str)
+                    url_list = list(set(url_list))
+                    sorted_url_list = sorted(url_list, key=place_sort)
+            if filename == "animal_code.google.com":
+                if "puzzle" in split_str and split_str not in url_list:
+                    url_list.append("http://" + server_name + split_str)
+                    url_list = list(set(url_list))
+                    sorted_url_list = sorted(url_list)
+        return sorted_url_list
 
 
 def download_images(img_urls, dest_dir):
@@ -58,24 +69,21 @@ def download_images(img_urls, dest_dir):
     except OSError as E:
         print(E)
         exit(1)
-    with open('index.html', 'w') as f:
+    html_img_tags_string = ""
+    with open(dest_dir + '/index.html', 'w') as f:
         f.write("<html><body>")
         for file in img_urls:
+            print("retrieving..: ", file)
             img_name = os.path.join(dest_dir, "img"+str(image_count)+".jpg")
-            f.write(f'<img src="{img_name}" />')
-            image_count += 1
             urllib.request.urlretrieve(file, img_name)
+            html_img_tags_string = '<img src="img' + \
+                str(image_count) + '.jpg">'
+            f.write(html_img_tags_string)
+            image_count += 1
+
         f.write('</body> </html>')
 
 
-# if f.endswith('.jpg'):
-    #         i = Image.open(f)
-    #         'fn, fext = os.path.splittext(f)'
-
-    #     print('Problem reading:' + f)
-    #     down_link = img_urls
-    #     path_to_save = dest_dir
-    # image1 = Image
 def create_parser():
     """Creates an argument parser object."""
     parser = argparse.ArgumentParser()
